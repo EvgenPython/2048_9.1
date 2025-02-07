@@ -58,7 +58,47 @@ def update_grid_cells():
                                            fg=CELL_COLOR_DICT[matrix[i][j]])
 
 def cover_up(mat):
-    pass
+    new = []
+    for i in range(len(mat)):
+        new.append([0] * len(mat))
+    done = False
+    for i in range(len(mat)):
+        count = 0
+        for j in range(len(mat)):
+            if mat[i][j] != 0:
+                new[i][count] = mat[i][j]
+                if count != 0:
+                    done = True
+                count += 1
+    return (new, done)
+
+def merge(mat):
+    done = False
+    for i in range(len(mat)):
+        for j in range(len(mat)-1):
+            if mat[i][j] == mat[i][j+1] and mat[i][j] != 0:
+                mat[i][j] *= 2
+                mat[i][j+1] = 0
+                done = True
+    return (mat, done)
+
+def left():
+    global matrix
+    matrix, done = cover_up(matrix)
+    temp = merge(matrix)
+    matrix = temp[0]
+    done = done or temp[1]
+    matrix = cover_up(matrix)[0]
+    return done
+
+def reverse(mat):
+    new = []
+    for i in range(len(mat)):
+        new.append([])
+        for j in range(len(mat[0])):
+            new[i].append(mat[i][len(mat[0])-j-1])
+    return new
+
 
 def main():
     init_grid()
