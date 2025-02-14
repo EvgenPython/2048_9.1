@@ -39,18 +39,22 @@ def init_grid():
             grid_row.append(t)
         grid_cells.append(grid_row)
 
+
 def init_matrix():
     for i in range(GRID_LEN):
         matrix.append([0] * GRID_LEN)
     add_two()
     add_two()
+
+
 def add_two():
-    a = random.randint(0, len(matrix)-1)
-    b = random.randint(0, len(matrix)-1)
+    a = random.randint(0, len(matrix) - 1)
+    b = random.randint(0, len(matrix) - 1)
     while matrix[a][b] != 0:
         a = random.randint(0, len(matrix) - 1)
         b = random.randint(0, len(matrix) - 1)
     matrix[a][b] = 2
+
 
 def update_grid_cells():
     for i in range(GRID_LEN):
@@ -61,6 +65,7 @@ def update_grid_cells():
                 grid_cells[i][j].configure(text=str(matrix[i][j]),
                                            bg=BACKGROUND_COLOR_DICT[matrix[i][j]],
                                            fg=CELL_COLOR_DICT[matrix[i][j]])
+
 
 def cover_up(mat):
     new = []
@@ -77,32 +82,38 @@ def cover_up(mat):
                 count += 1
     return (new, done)
 
+
 def merge(mat):
     done = False
     for i in range(len(mat)):
-        for j in range(len(mat)-1):
-            if mat[i][j] == mat[i][j+1] and mat[i][j] != 0:
+        for j in range(len(mat) - 1):
+            if mat[i][j] == mat[i][j + 1] and mat[i][j] != 0:
                 mat[i][j] *= 2
-                mat[i][j+1] = 0
+                mat[i][j + 1] = 0
                 done = True
     return (mat, done)
+
 
 def left():
     global matrix
     matrix, done = cover_up(matrix)
+    print("Left")
     temp = merge(matrix)
     matrix = temp[0]
     done = done or temp[1]
     matrix = cover_up(matrix)[0]
     return done
 
+
 def reverse(mat):
     new = []
     for i in range(len(mat)):
         new.append([])
         for j in range(len(mat[0])):
-            new[i].append(mat[i][len(mat[0])-j-1])
+            new[i].append(mat[i][len(mat[0]) - j - 1])
     return new
+
+
 def transpose(mat):
     new = []
     for i in range(len(mat[0])):
@@ -110,6 +121,7 @@ def transpose(mat):
         for j in range(len(mat)):
             new[i].append(mat[j][i])
     return new
+
 
 def right():
     global matrix
@@ -122,6 +134,7 @@ def right():
     matrix = reverse(matrix)
     return done
 
+
 def up():
     global matrix
     matrix = transpose(matrix)
@@ -132,6 +145,8 @@ def up():
     matrix = cover_up(matrix)[0]
     matrix = transpose(matrix)
     return done
+
+
 def down():
     global matrix
     matrix = reverse(transpose(matrix))
@@ -142,6 +157,8 @@ def down():
     matrix = cover_up(matrix)[0]
     matrix = reverse(transpose(matrix))
     return done
+
+
 def key_down(even):
     key = repr(even.char)
     if key[1] in mainframe.commands:
@@ -149,26 +166,36 @@ def key_down(even):
         if done:
             add_two()
             update_grid_cells()
+            if game_state() == 'win':
+                grid_cells[1][1].configure(text="You", bg=BACKGROUND_COLOR_CELL_EMPTY)
+                grid_cells[1][2].configure(text="Win!", bg=BACKGROUND_COLOR_CELL_EMPTY)
+            if game_state() == 'lose':
+                grid_cells[1][1].configure(text="You", bg=BACKGROUND_COLOR_CELL_EMPTY)
+                grid_cells[1][2].configure(text="Lose!", bg=BACKGROUND_COLOR_CELL_EMPTY)
+
+
 def game_state():
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             if matrix[i][j] == 2048:
                 return 'win'
-    for i in range(len(matrix)-1):
-        for j in range(len(matrix[0])-1):
-            if matrix[i][j] == matrix[i+1][j] or matrix[i][j+1] == matrix[i][j]:
+    for i in range(len(matrix) - 1):
+        for j in range(len(matrix[0]) - 1):
+            if matrix[i][j] == matrix[i + 1][j] or matrix[i][j + 1] == matrix[i][j]:
                 return 'not over'
     for i in range(len(matrix)):
         for j in range(len(matrix[0])):
             if matrix[i][j] == 0:
                 return 'not over'
-    for k in range(len(matrix)-1):
-        if matrix[len(matrix)-1][k] == matrix[len(matrix)-1][k+1]:
+    for k in range(len(matrix) - 1):
+        if matrix[len(matrix) - 1][k] == matrix[len(matrix) - 1][k + 1]:
             return 'not over'
-    for j in range(len(matrix)-1):
-        if matrix[j][len(matrix)-1] == matrix[j+1][len(matrix)-1]:
+    for j in range(len(matrix) - 1):
+        if matrix[j][len(matrix) - 1] == matrix[j + 1][len(matrix) - 1]:
             return 'not over'
     return 'lose'
+
+
 def main():
     mainframe.master.title("2048")
     mainframe.master.bind("<Key>", key_down)
@@ -176,9 +203,9 @@ def main():
         down, KEY_LEFT: left, KEY_RIGHT: right}
     init_grid()
     init_matrix()
-    print(matrix)
     update_grid_cells()
     mainloop()
+
 
 if __name__ == "__main__":
     main()
